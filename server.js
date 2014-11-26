@@ -1,7 +1,6 @@
 var net = require('net')
 	,port = 8894
 	,tool = require('./tool')//自定义的工具
-	,request = require('request')
 ;
 net.createServer({ allowHalfOpen: true},function(client){
 	client.setKeepAlive(true, 15 * 1000);

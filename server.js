@@ -9,7 +9,7 @@ net.createServer({ allowHalfOpen: true},function(client){
         client.end();
     });
     
-    client.on("error", function () {
+    client.on("error", function (err) {
         client.destroy();
     });
 

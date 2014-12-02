@@ -47,7 +47,7 @@ net.createServer({ allowHalfOpen: true},function(client){
 
             var header = buffer.slice(0, _body_pos).toString('utf8');
 
-            //替换connection头
+            //替换connection头 设置 connection:close 保证每个文件执行一次请求
             header = header.replace(/(proxy-)?connection\:.+\r\n/ig, '')
                 .replace(/Keep-Alive\:.+\r\n/i, '')
                 .replace("\r\n", '\r\nConnection: close\r\n');
@@ -77,6 +77,12 @@ net.createServer({ allowHalfOpen: true},function(client){
 
 function proxyConnectAction(client, server, req, buffer) {
     if (req.method == 'CONNECT') {
+        /*
+            告诉客户端 连接确认（Connection established）
+            HTTP Connection的 close设置允许客户端或服务器中任何一方关闭底层的连接，双方都会要求在处理请求后关闭它们的TCP连接
+            这样可以减少代理服务器的消耗
+            其实没有保持原样（使用Keep-Alive）  是还没有找到具体的实现方法和实现起来比较麻烦，所以设置了close 保证每个文件执行一次请求
+        */
         client.write(tool.encrypt(new Buffer("HTTP/1.1 200 Connection established\r\nConnection: close\r\n\r\n")));
     } else {
         server.write(buffer);
